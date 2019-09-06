@@ -2,6 +2,9 @@ import random
 import bisect
 import itertools
 import collections
+import argparse
+
+from pathlib import Path
 
 
 class OutputNode:
@@ -97,9 +100,33 @@ class Grammar:
         return output_root
 
 
+def parse_args():
+    # Command line argument parser code by Arya McCarthy.
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("-t", "--tree", help="Print trees instead of basic sentences",
+                        action="store_true")
+    parser.add_argument("grammar_file", type=Path, help="Grammar file name")
+    parser.add_argument("-M", type=int, help="maximum number of expanded non-terminals",
+                        default=None)
+    parser.add_argument("--seed", type=int, help="random seed for the generator",
+                        default=0)
+    parser.add_argument("num_sentences", type=int, help="number of output sentences",
+                        default=1, nargs='?')
+    parser_args = parser.parse_args()
+    assert parser_args.grammar_file.is_file()
+    assert parser_args.num_sentences >= 0
+    assert parser_args.M is None or parser_args.M >= 0
+    assert parser_args.seed >= 0
+    return parser_args
+
+
 if __name__ == '__main__':
-    with open('grammar.gr') as grammar_file:
-        grammar = Grammar.read_from_file(grammar_file, seed=0)
-        output_tree = grammar.generate_tree(max_non_terms=None)
-        print('Tree:', output_tree.show_tree())
-        print('Tokens:', output_tree.show_tokens())
+    args = parse_args()
+
+    with open(args.grammar_file) as grammar_file:
+        grammar = Grammar.read_from_file(grammar_file, seed=args.seed)
+        output_tree = grammar.generate_tree(max_non_terms=args.M)
+        if args.tree:
+            print(output_tree.show_tree())
+        else:
+            print(output_tree.show_tokens())
