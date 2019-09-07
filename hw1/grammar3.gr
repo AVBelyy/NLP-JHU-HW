@@ -39,11 +39,12 @@
 1	S	NP VP
 0.1 S   it V1[inanim] NP that S
 0.1 S   that S V1[inanim] NP
-0.5 VP  V2 NP PP
 1	VP	V1 NP
 1   VP  V0
+0.5 VP  VP PP
 0.2 VP  V[conj] that S
 0.1 VP  VP Conj VP
+0.1 V1  V1 Conj V1
 0.1 NP  NP Conj NP
 1	NP	Det Noun
 0.2	NP	NP PP
@@ -51,14 +52,13 @@
 1   AP  Adv Adj
 0.1 AP  Adv AP
 1	Noun	AP Noun
+1	Noun	Adj Noun
 
 # Vocabulary.  Your program can see that "ate" is a terminal
 # symbol because there exists no rule for rewriting it.
 # Any symbol that can rewrite as a terminal (or a string of 
 # terminals, like "chief of staff") is called a "preterminal."  Notice 
 # that a preterminal is a special kind of nonterminal.
-
-1   V2  worked on
 
 1	V1	ate
 1	V1	wanted
@@ -72,6 +72,7 @@
 1   V1[inanim]  frightened
 
 1   V0  sighed
+1   V0  worked
 
 1   V[conj] thought
 1   V[conj] suggested
