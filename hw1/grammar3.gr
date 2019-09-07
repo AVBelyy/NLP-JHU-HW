@@ -46,6 +46,7 @@
 0.1 VP  VP Conj VP
 0.1 V1  V1 Conj V1
 0.1 NP  NP Conj NP
+1   NP  ProperNoun
 1	NP	Det Noun
 0.2	NP	NP PP
 1	PP	Prep NP
@@ -83,7 +84,8 @@
 1	Det	a
 1	Det	every
 
-1   Noun    Sally
+1   ProperNoun  Sally
+
 1	Noun	president
 1	Noun	sandwich
 1	Noun	pickle
