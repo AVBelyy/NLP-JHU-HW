@@ -125,8 +125,9 @@ if __name__ == '__main__':
 
     with open(args.grammar_file) as grammar_file:
         grammar = Grammar.read_from_file(grammar_file, seed=args.seed)
-        output_tree = grammar.generate_tree(max_non_terms=args.M)
-        if args.tree:
-            print(output_tree.show_tree())
-        else:
-            print(output_tree.show_tokens())
+        for i in range(args.num_sentences):
+            output_tree = grammar.generate_tree(max_non_terms=args.M)
+            if args.tree:
+                print(output_tree.show_tree())
+            else:
+                print(output_tree.show_tokens())
