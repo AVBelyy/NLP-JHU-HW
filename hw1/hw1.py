@@ -106,8 +106,6 @@ def parse_args():
     parser.add_argument("-t", "--tree", help="Print trees instead of basic sentences",
                         action="store_true")
     parser.add_argument("grammar_file", type=Path, help="Grammar file name")
-    parser.add_argument("-M", type=int, help="maximum number of expanded non-terminals",
-                        default=None)
     parser.add_argument("--seed", type=int, help="random seed for the generator",
                         default=0)
     parser.add_argument("num_sentences", type=int, help="number of output sentences",
@@ -115,7 +113,6 @@ def parse_args():
     parser_args = parser.parse_args()
     assert parser_args.grammar_file.is_file()
     assert parser_args.num_sentences >= 0
-    assert parser_args.M is None or parser_args.M >= 0
     assert parser_args.seed >= 0
     return parser_args
 
@@ -126,7 +123,7 @@ if __name__ == '__main__':
     with open(args.grammar_file) as grammar_file:
         grammar = Grammar.read_from_file(grammar_file, seed=args.seed)
         for i in range(args.num_sentences):
-            output_tree = grammar.generate_tree(max_non_terms=args.M)
+            output_tree = grammar.generate_tree(max_non_terms=450)  # Magic constant by Jason.
             if args.tree:
                 print(output_tree.show_tree())
             else:
