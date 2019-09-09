@@ -69,7 +69,8 @@ class Grammar:
 
     def generate_tree(self, max_non_terms=None):
         # We will traverse the grammar with breadth-first search (BFS).
-        queue = [('ROOT', OutputNode('ROOT'))]
+        output_root = OutputNode('ROOT')
+        queue = [('ROOT', output_root)]
         non_terms_cnt = 0
 
         while len(queue) > 0:
