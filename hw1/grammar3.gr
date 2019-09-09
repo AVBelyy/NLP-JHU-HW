@@ -47,13 +47,14 @@
 0.1 V1  V1 Conj V1
 0.1 NP  NP Conj NP
 1   NP  ProperNoun
-1	NP	Det Noun
+1	NP	Det APNoun
 0.2	NP	NP PP
 1	PP	Prep NP
-1   AP  Adv Adj
+1   AP  Adj
 0.1 AP  Adv AP
-1	Noun	AP Noun
-1	Noun	Adj Noun
+1   APNoun  Noun
+1   APNoun  AP Noun
+0.2 Noun    Adj Noun
 
 # Vocabulary.  Your program can see that "ate" is a terminal
 # symbol because there exists no rule for rewriting it.
@@ -94,10 +95,8 @@
 1   Noun    proposal
 1   Noun    desk
 
-1   Adv quite
 1   Adv very
 1   Adv extremely
-1   Adv pleasantly
 
 1	Adj	fine
 1	Adj	delicious
