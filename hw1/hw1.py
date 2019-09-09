@@ -68,11 +68,10 @@ class Grammar:
         return Grammar(rules, seed=seed)
 
     def generate_tree(self, max_non_terms=None):
-        output_root = OutputNode('ROOT')
+        # We will traverse the grammar with breadth-first search (BFS).
+        queue = [('ROOT', OutputNode('ROOT'))]
         non_terms_cnt = 0
 
-        # We will traverse the grammar with breadth-first search (BFS).
-        queue = [('ROOT', output_root)]
         while len(queue) > 0:
             # Top element from the queue is always a non-terminal.
             (top, output_parent), *queue = queue
@@ -103,12 +102,12 @@ class Grammar:
 def parse_args():
     # Command line argument parser code by Arya McCarthy.
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("-t", "--tree", help="Print trees instead of basic sentences",
-                        action="store_true")
-    parser.add_argument("grammar_file", type=Path, help="Grammar file name")
-    parser.add_argument("--seed", type=int, help="random seed for the generator",
+    parser.add_argument('-t', '--tree', help='Print trees instead of basic sentences',
+                        action='store_true')
+    parser.add_argument('grammar_file', type=Path, help='Grammar file name')
+    parser.add_argument('--seed', type=int, help='random seed for the generator',
                         default=0)
-    parser.add_argument("num_sentences", type=int, help="number of output sentences",
+    parser.add_argument('num_sentences', type=int, help='number of output sentences',
                         default=1, nargs='?')
     parser_args = parser.parse_args()
     assert parser_args.grammar_file.is_file()
