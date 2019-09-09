@@ -19,9 +19,9 @@
 
 # Rules for creating full sentences.
 
-1	ROOT	S .
-1	ROOT	S !
-1	ROOT	is it true that S ?     # mixing terminals and nonterminals is ok.
+1   ROOT    S .
+1   ROOT    S !
+1   ROOT    is it true that S ?     # mixing terminals and nonterminals is ok.
 
 # The basic grammar rules.  Here's what the abbreviations stand for:
 #    S  = sentence
@@ -29,25 +29,28 @@
 #    VP = verb phrase
 #    PP = prepositional phrase
 #    AP = adjective phrase
+#    APNoun = adjective phrase + Noun
 #    Det = determiner (sometimes called "article")
 #    Prep = preposition
 #    Adj = adjective
+#    V[inanim] = verbs that 'go well' with an inanimate subject (e.g. it)
+#    V[conj] = verbs that provide a 'conjunction' between main and dependent clause
 #    V1 = transitive verb (expects 1 object)
 #    V0 = intransitive verb (does not expect an object)
 
-1	S	NP VP
-0.1 S   it V1[inanim] NP that S
-0.1 S   that S V1[inanim] NP
-1	VP	V1 NP
-1   VP  V0
-0.5 VP  VP PP
-0.2 VP  V[conj] that S
-0.1 VP  VP Conj VP
-0.1 V1  V1 Conj V1
-0.1 NP  NP Conj NP
-1   NP  ProperNoun
-0.2	NP	NP PP
-1	PP	Prep NP
+1   S       NP VP
+0.1 S       it V1[inanim] NP that S
+0.1 S       that S V1[inanim] NP
+1   VP      V1 NP
+1   VP      V0
+0.5 VP      VP PP
+0.2 VP      V[conj] that S
+0.1 VP      VP Conj VP
+0.1 V1      V1 Conj V1
+0.1 NP      NP Conj NP
+1   NP      ProperNoun
+0.2 NP      NP PP
+1   PP      Prep NP
 
 # Vocabulary.  Your program can see that "ate" is a terminal
 # symbol because there exists no rule for rewriting it.
@@ -55,88 +58,85 @@
 # terminals, like "chief of staff") is called a "preterminal."  Notice 
 # that a preterminal is a special kind of nonterminal.
 
-1	V1	ate
-1	V1	wanted
-1	V1	kissed
-1	V1	understood
-1	V1	pickled
+1   V1          ate
+1   V1          wanted
+1   V1          kissed
+1   V1          understood
+1   V1          pickled
 
-# TODO: ask native speakers
 1   V1[inanim]  surprised
 1   V1[inanim]  perplexed
 1   V1[inanim]  frightened
 
-1   V0  sighed
-1   V0  worked
+1   V0          sighed
+1   V0          worked
 
-1   V[conj] thought
-1   V[conj] suggested
-1   V[conj] realised
-1   V[conj] proposed
+1   V[conj]     thought
+1   V[conj]     suggested
+1   V[conj]     realised
+1   V[conj]     proposed
 
-1	Det	the
-1	Det	every
-1	Det[a]	a
-1	Det[an]	an
+1   Det         the
+1   Det         every
+1   Det[a]      a
+1   Det[an]     an
 
 1   ProperNoun  Sally
 
-1	Noun[a]	president
-1	Noun[a]	sandwich
-1	Noun[a]	pickle
-1	Noun[a]	chief of staff
-1	Noun[a]	floor
-1   Noun[a] proposal
-1   Noun[a] desk
+1   Noun[a]     president
+1   Noun[a]     sandwich
+1   Noun[a]     pickle
+1   Noun[a]     chief of staff
+1   Noun[a]     floor
+1   Noun[a]     proposal
+1   Noun[a]     desk
 1   Noun[an]    apple
 1   Noun[an]    orange
 
-1   Adv[a] very
-1   Adv[an] extremely
+1   Adv[a]      very
+1   Adv[an]     extremely
 
-1	Adj[a]	fine
-1	Adj[a]	delicious
-1	Adj[a]	perplexed
-1	Adj[a]	pickled
-1   Adj[an] interesting
-1   Adj[an] entertaining
-1   Adj[an] ambivalent
+1   Adj[a]      fine
+1   Adj[a]      delicious
+1   Adj[a]      perplexed
+1   Adj[a]      pickled
+1   Adj[an]     interesting
+1   Adj[an]     entertaining
+1   Adj[an]     ambivalent
 
-1	Prep	with
-1	Prep	on
-1	Prep	under
-1	Prep	in
+1   Prep        with
+1   Prep        on
+1   Prep        under
+1   Prep        in
 
-1   Conj    and
-1   Conj    or
-
+1   Conj        and
+1   Conj        or
 
 # New rules for Exercise 7
 
 # (a) 'a' vs 'an'
-1	NP	Det APNoun[a] #
-1	NP	Det APNoun[an] #
-1	NP	Det[a] APNoun[a] #
-1	NP	Det[an] APNoun[an] #
-1   AP[a]       Adj[a] #
-1   AP[an]      Adj[an] #
-0.1 AP[a]       Adv[a] AP[a] #
-0.1 AP[a]       Adv[a] AP[an] #
-1   AP[an]      Adv[an] AP[an] #
-1   AP[an]      Adv[an] AP[a] #
-1	APNoun[a]   Noun[a] #
-1	APNoun[an]  Noun[an] #
-1	APNoun[a]   AP[a] Noun[a] #
-1	APNoun[a]   AP[a] Noun[an] #
-1	APNoun[an]  AP[an] Noun[an] #
-1	APNoun[an]  AP[an] Noun[a] #
-0.2	Noun[a]	    Adj[a] Noun[a] #
-0.2	Noun[a]	    Adj[a] Noun[an] #
-0.2	Noun[an]	Adj[an] Noun[an] #
-0.2	Noun[an]	Adj[an] Noun[a] #
+1   NP          Det APNoun[a]
+1   NP          Det APNoun[an]
+1   NP          Det[a] APNoun[a]
+1   NP          Det[an] APNoun[an]
+1   AP[a]       Adj[a]
+1   AP[an]      Adj[an]
+0.1 AP[a]       Adv[a] AP[a]
+0.1 AP[a]       Adv[a] AP[an]
+1   AP[an]      Adv[an] AP[an]
+1   AP[an]      Adv[an] AP[a]
+1   APNoun[a]   Noun[a]
+1   APNoun[an]  Noun[an]
+1   APNoun[a]   AP[a] Noun[a]
+1   APNoun[a]   AP[a] Noun[an]
+1   APNoun[an]  AP[an] Noun[an]
+1   APNoun[an]  AP[an] Noun[a]
+0.2 Noun[a]     Adj[a] Noun[a]
+0.2 Noun[a]     Adj[a] Noun[an]
+0.2 Noun[an]    Adj[an] Noun[an]
+0.2 Noun[an]    Adj[an] Noun[a]
 
 # (c) Relative clauses
-
-0.1 NP  NP that VP
-0.1 NP  NP that NP V1
-0.1 NP  NP that NP V[conj] that NP V1
+0.1 NP          NP that VP
+0.1 NP          NP that NP V1
+0.1 NP          NP that NP V[conj] that NP V1

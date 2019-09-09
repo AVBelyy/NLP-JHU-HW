@@ -19,9 +19,9 @@
 
 # Rules for creating full sentences.
 
-1	ROOT	S .
-1	ROOT	S !
-1	ROOT	is it true that S ?     # mixing terminals and nonterminals is ok.
+1   ROOT    S .
+1   ROOT    S !
+1   ROOT    is it true that S ?     # mixing terminals and nonterminals is ok.
 
 # The basic grammar rules.  Here's what the abbreviations stand for:
 #    S  = sentence
@@ -29,29 +29,31 @@
 #    VP = verb phrase
 #    PP = prepositional phrase
 #    AP = adjective phrase
+#    APNoun = adjective phrase + Noun
 #    Det = determiner (sometimes called "article")
 #    Prep = preposition
 #    Adj = adjective
-#    V2 = transitive verb (expects 2 objects)
+#    V[inanim] = verbs that 'go well' with an inanimate subject (e.g. it)
+#    V[conj] = verbs that provide a 'conjunction' between main and dependent clause
 #    V1 = transitive verb (expects 1 object)
 #    V0 = intransitive verb (does not expect an object)
 
-1	S	NP VP
-0.1 S   it V1[inanim] NP that S
-0.1 S   that S V1[inanim] NP
-1	VP	V1 NP
-1   VP  V0
-0.5 VP  VP PP
-0.2 VP  V[conj] that S
-0.1 VP  VP Conj VP
-0.1 V1  V1 Conj V1
-0.1 NP  NP Conj NP
-1   NP  ProperNoun
-1	NP	Det APNoun
-0.2	NP	NP PP
-1	PP	Prep NP
-1   AP  Adj
-0.1 AP  Adv AP
+1   S       NP VP
+0.1 S       it V1[inanim] NP that S
+0.1 S       that S V1[inanim] NP
+1   VP      V1 NP
+1   VP      V0
+0.5 VP      VP PP
+0.2 VP      V[conj] that S
+0.1 VP      VP Conj VP
+0.1 V1      V1 Conj V1
+0.1 NP      NP Conj NP
+1   NP      ProperNoun
+1   NP      Det APNoun
+0.2 NP      NP PP
+1   PP      Prep NP
+1   AP      Adj
+0.1 AP      Adv AP
 1   APNoun  Noun
 1   APNoun  AP Noun
 0.2 Noun    Adj Noun
@@ -62,51 +64,50 @@
 # terminals, like "chief of staff") is called a "preterminal."  Notice 
 # that a preterminal is a special kind of nonterminal.
 
-1	V1	ate
-1	V1	wanted
-1	V1	kissed
-1	V1	understood
-1	V1	pickled
+1   V1          ate
+1   V1          wanted
+1   V1          kissed
+1   V1          understood
+1   V1          pickled
 
-# TODO: ask native speakers
 1   V1[inanim]  surprised
 1   V1[inanim]  perplexed
 1   V1[inanim]  frightened
 
-1   V0  sighed
-1   V0  worked
+1   V0          sighed
+1   V0          worked
 
-1   V[conj] thought
-1   V[conj] suggested
-1   V[conj] realised
-1   V[conj] proposed
+1   V[conj]     thought
+1   V[conj]     suggested
+1   V[conj]     realised
+1   V[conj]     proposed
 
-1	Det	the
-1	Det	a
-1	Det	every
+1   Det         the
+1   Det         a
+1   Det         every
 
 1   ProperNoun  Sally
 
-1	Noun	president
-1	Noun	sandwich
-1	Noun	pickle
-1	Noun	chief of staff
-1	Noun	floor
-1   Noun    proposal
-1   Noun    desk
+1   Noun        president
+1   Noun        sandwich
+1   Noun        pickle
+1   Noun        chief of staff
+1   Noun        floor
+1   Noun        proposal
+1   Noun        desk
 
-1   Adv very
-1   Adv extremely
+1   Adv         very
+1   Adv         extremely
 
-1	Adj	fine
-1	Adj	delicious
-1	Adj	perplexed
-1	Adj	pickled
+1   Adj         fine
+1   Adj         delicious
+1   Adj         perplexed
+1   Adj         pickled
 
-1	Prep	with
-1	Prep	on
-1	Prep	under
-1	Prep	in
+1   Prep        with
+1   Prep        on
+1   Prep        under
+1   Prep        in
 
-1   Conj    and
-1   Conj    or
+1   Conj        and
+1   Conj        or
