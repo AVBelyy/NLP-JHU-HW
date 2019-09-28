@@ -140,9 +140,11 @@ class LanguageModel:
         self._count_ngram(())
 
     def _count_ngram(self, ngram: Ngram) -> None:
+        """Count the n-gram; that is, increment its count in the model."""
         self.tokens[ngram] += 1
 
     def num_tokens(self, corpus: Path) -> int:
+        """Give the number of tokens in the corpus, including EOS."""
         return sum(1 for token in get_tokens(corpus))
 
     def prob(self, x: str, y: str, z: str) -> float:
@@ -160,14 +162,18 @@ class LanguageModel:
     def load(cls, source: Path) -> "LanguageModel":
         import pickle
 
+        log.info(f"Loading model from {source}")
         with open(source, mode="rb") as f:
             return pickle.load(f)
+        log.info(f"Loaded model from {source}")
 
     def save(self, destination: Path) -> None:
         import pickle
 
+        log.info(f"Saving model to {destination}")
         with open(destination, mode="wb") as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
+        log.info(f"Saved model to {destination}")
 
     def replace_missing(self, token: str) -> str:
         assert self.vocab is not None
@@ -183,7 +189,7 @@ class LanguageModel:
         testing program. You'd do it only once and save the trained model to disk
         in some format.
         """
-        log.info("Training from corpus {corpus}")
+        log.info(f"Training from corpus {corpus}")
         # The real work:
         # accumulate the type and token counts into the global hash tables.
 
@@ -264,7 +270,7 @@ class BackoffAddLambdaLanguageModel(LanguageModel):
         self.lambda_ = lambda_
 
     def prob(self, x: str, y: str, z: str) -> float:
-        # Reimplement me!
+        # TODO: Reimplement me!
         return super().prob(x, y, z)
 
 
@@ -293,9 +299,9 @@ class LogLinearLanguageModel(LanguageModel):
             vectors: Dict[str, Vector] = {}
             for line in f:
                 word, *arr = line.split()
-                self.vectors[word] = [float(x) for x in arr]
+                vectors[word] = [float(x) for x in arr]
 
-        return vectors, dim  # TODO - this shouldn't be 0.
+        return vectors, dim
 
     def replace_missing(self, token: str) -> str:
         # substitute out-of-lexicon words with OOL symbol 
@@ -307,7 +313,7 @@ class LogLinearLanguageModel(LanguageModel):
         return token
 
     def prob(self, x: str, y: str, z: str) -> float:
-        # Reimplement me!
+        # TODO: Reimplement me!
         return super().prob(x, y, z)
 
     def train(self, corpus: Path) -> List[str]:

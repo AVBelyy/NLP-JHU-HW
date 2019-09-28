@@ -67,19 +67,11 @@ def parse_args() -> argparse.Namespace:
 
     args = parser.parse_args()
 
-    # # Sanity-check the configuration.
-    # if args.smooth_amount is not None:
-    #     assert args.smoother in {"add", "backoff_add", "loglinear"}
-    # else:
-    #     assert args.smooth_amount >= 0
-
+    # Sanity-check the configuration.
     if args.mode == "TRAIN" and args.test_files:
         parser.error("Shouldn't see test files when training.")
     elif args.mode == "TEST" and not args.test_files:
         parser.error("No test files specified.")
-
-    # if args.lexicon:
-    #     assert args.smoother == "loglinear"
 
     return args
 
@@ -91,9 +83,7 @@ def main():
 
     if args.mode == TRAIN:
         log.info("Training...")
-        lm = LanguageModel.make(args.smoother, args.lexicon)  #
-        # lm.set_smoother(args.smoother)
-        # lm.read_vectors(args.lexicon)
+        lm = LanguageModel.make(args.smoother, args.lexicon)
 
         lm.train(args.train_file)
         lm.save(destination=model_path)
@@ -105,6 +95,7 @@ def main():
         # But we'd like to print a value in bits: so we convert
         # log base e to log base 2 at print time, by dividing by log(2).
 
+        log.info("Printing file log-likelihoods.")
         total_log_prob = 0.0
         for test_file in args.test_files:
             log_prob = lm.file_log_prob(test_file) / np.log(2)
