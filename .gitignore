@@ -1,5 +1,7 @@
 .idea/
+.ipynb_checkpoints/
 __pycache__/
 .venv/
 *.zip
+*.pdf
 .DS_Store

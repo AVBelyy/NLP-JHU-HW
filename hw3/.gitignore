@@ -1,3 +1,9 @@
 INSTRUCTIONS
 data/
 *.model
+en.1K
+sp.1K
+gen
+spam
+chars-*.txt
+words-*.txt
