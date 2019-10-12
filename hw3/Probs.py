@@ -340,7 +340,7 @@ class LogLinearLanguageModel(LanguageModel):
         return vec_arr, lexicon
 
     def replace_missing(self, token: str) -> str:
-        # substitute out-of-lexicon words with OOL symbol 
+        # substitute out-of-lexicon words with OOL symbol
         assert self.vocab is not None
         if token not in self.vocab:
             token = OOV
@@ -446,8 +446,7 @@ class LogLinearLanguageModel(LanguageModel):
         self.logC = 0.
 
         # Optimization hyperparameters
-        # TODO: change for lang ID !!!
-        gamma0 = 0.1  # initial learning rate, used to compute actual learning rate
+        gamma0 = 0.01  # initial learning rate, used to compute actual learning rate
         epochs = 10  # number of passes
 
         self.N = len(tokens_list) - 4  # number of training instances
