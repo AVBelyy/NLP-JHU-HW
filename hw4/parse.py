@@ -6,12 +6,15 @@ from typing import Dict, Tuple, List
 
 
 class Semiring:
+    """
+    Generalized functions for CKY.
+    """
     @staticmethod
     def weight(prob):
         raise NotImplementedError
 
     @staticmethod
-    def log_prob(weight):
+    def inv_weight(weight):
         raise NotImplementedError
 
     @staticmethod
@@ -27,13 +30,44 @@ class Semiring:
         raise NotImplementedError
 
 
+class Recognizer(Semiring):
+    """
+    Semiring for recognizing a parse (if a rule can be parsed).
+    Weight = {true, false}
+    """
+
+    @staticmethod
+    def weight(prob):
+        return True
+
+    @staticmethod
+    def inv_weight(weight):
+        return weight
+
+    @staticmethod
+    def zero():
+        return False
+
+    @staticmethod
+    def plus(a, b):
+        return a | b
+
+    @staticmethod
+    def times(a, b):
+        return a & b
+
+
 class Viterbi(Semiring):
+    """
+    Semiring for finding min weight (best) parse.
+    Weight = -log2(Prob)
+    """
     @staticmethod
     def weight(prob):
         return -np.log2(prob)
 
     @staticmethod
-    def log_prob(weight):
+    def inv_weight(weight):
         return weight
 
     @staticmethod
@@ -49,23 +83,31 @@ class Viterbi(Semiring):
         return a + b
 
 
-class MinViterbi(Viterbi):
+class InvViterbi(Viterbi):
+    """
+    Semiring for finding max weight (worst) parse.
+    Weight = log2(Prob)
+    """
     @staticmethod
     def weight(prob):
         return np.log2(prob)
 
     @staticmethod
-    def log_prob(weight):
+    def inv_weight(weight):
         return -weight
 
 
 class Inside(Semiring):
+    """
+    Semiring for finding total weight.
+    Weight = log2(Prob)
+    """
     @staticmethod
     def weight(prob):
         return np.log2(prob)
 
     @staticmethod
-    def log_prob(weight):
+    def inv_weight(weight):
         return -weight
 
     @staticmethod
@@ -176,8 +218,8 @@ if __name__ == '__main__':
     assert len(sys.argv) == 4
     mode, grammar_path, sents_path = sys.argv[1:]
 
-    sring = {'RECOGNIZER': Viterbi, 'BEST-PARSE': Viterbi,
-             'WORST-PARSE': MinViterbi, 'TOTAL-WEIGHT': Inside}.get(mode)
+    sring = {'RECOGNIZER': Recognizer, 'BEST-PARSE': Viterbi,
+             'WORST-PARSE': InvViterbi, 'TOTAL-WEIGHT': Inside}.get(mode)
 
     assert sring is not None
 
@@ -194,11 +236,11 @@ if __name__ == '__main__':
             elif mode == 'BEST-PARSE' or mode == 'WORST-PARSE':
                 if parse_weight is not None:
                     best_tree = generate_tree(sent, parse_backptrs, 0, len(sent), 'ROOT')
-                    print('%.3f\t%s' % (sring.log_prob(parse_weight), best_tree))
+                    print('%.3f\t%s' % (sring.inv_weight(parse_weight), best_tree))
                 else:
                     print('NOPARSE')
             else:  # mode == 'TOTAL-WEIGHT'
                 if parse_weight is not None:
-                    print('%.3f' % sring.log_prob(parse_weight))
+                    print('%.3f' % sring.inv_weight(parse_weight))
                 else:
                     print('NOPARSE')
