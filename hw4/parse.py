@@ -104,11 +104,11 @@ class Inside(Semiring):
     """
     @staticmethod
     def weight(prob):
-        return np.log2(prob)
+        return np.log(prob)
 
     @staticmethod
     def inv_weight(weight):
-        return -weight
+        return -weight / np.log(2)
 
     @staticmethod
     def zero():
