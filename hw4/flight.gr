@@ -1,0 +1,71 @@
+1	ROOT	S Punc
+1	Punc	.
+0.8	S	NP VP
+0.15	S	XA VP
+0.2	VP	Verb NP
+0.1	VP	XB PP
+0.1	VP	Verb PP
+0.1	VP	XB NP
+0.15	VP	VP PP
+1.0	XA	Aux NP
+0.2	NP	Det Nominal
+0.075	Nominal	book
+0.3	Nominal	flight
+0.225	Nominal	flight2
+0.01125	Nominal	meal
+0.06375	Nominal	money
+0.075	Nominal	dinner
+0.2	Nominal	Nominal Noun
+0.05	Nominal	Nominal PP
+1.0	XB	Verb NP
+1.0	PP	Preposition NP
+0.1	Det	that
+0.3	Det	a
+0.6	Det	the
+0.1	Noun	book
+0.4	Noun	flight
+0.3	Noun	flight2
+0.015	Noun	meal
+0.085	Noun	money
+0.1	Noun	dinner
+0.3	Verb	book
+0.3	Verb	include
+0.4	Verb	prefer
+0.4	Pronoun	I
+0.05	Pronoun	she
+0.15	Pronoun	me
+0.4	Pronoun	you
+0.6	Proper-Noun	Houston
+0.4	Proper-Noun	NWA
+0.6	Aux	does
+0.4	Aux	can
+0.3	Preposition	from
+0.3	Preposition	to
+0.2	Preposition	on
+0.15	Preposition	near
+0.05	Preposition	though
+0.01	S	Verb NP
+0.005	S	XB PP
+0.005	S	Verb PP
+0.005	S	XB NP
+0.0075	S	VP PP
+0.105	VP	book
+0.105	VP	include
+0.14	VP	prefer
+0.14	NP	I
+0.0175	NP	she
+0.0525	NP	me
+0.140075	NP	you
+0.18	NP	Houston
+0.12	NP	NWA
+0.01125	NP	book
+0.045	NP	flight
+0.033675	NP	flight2
+0.0016875	NP	meal
+0.0095625	NP	money
+0.01125	NP	dinner
+0.03	NP	Nominal Noun
+0.0075	NP	Nominal PP
+0.00525	S	book
+0.00525	S	include
+0.007	S	prefer
