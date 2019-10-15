@@ -37,7 +37,7 @@ words_df = words_df[["position", "bare", "accented"]]
 
 
 def get_ru_word(id):
-    return words_df.loc[id].accented
+    return words_df.loc[id].bare
 
 # Join translations and words based on ID
 translation_df["ru_word"] = translation_df.word_id.map(lambda x: get_ru_word(x))
@@ -46,6 +46,6 @@ translation_df["ru_word"] = translation_df.word_id.map(lambda x: get_ru_word(x))
 with open(output_dict, "w+") as f:
     for row in translation_df.itertuples():
         for en_translation in row.tl:
-            #f.write(f"{en_translation}\t{row.ru_word}\n")
-            f.write(f"{row.ru_word}\t{en_translation}\n")
+            f.write(f"{en_translation}\t{row.ru_word}\n")
+            #f.write(f"{row.ru_word}\t{en_translation}\n")
 

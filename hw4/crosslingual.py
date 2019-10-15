@@ -29,7 +29,10 @@ class GrammarProjector:
         with open(dictionary_path) as f:
             for line in f.readlines():
                 english_token, foreign_token = [token.strip() for token in line.split("\t")]
-                bilingual_dict[english_token] = foreign_token
+                if english_token in bilingual_dict:
+                    bilingual_dict[english_token].append(foreign_token)
+                else:
+                    bilingual_dict[english_token] = [foreign_token]
         return bilingual_dict
 
     def project_grammar(self, en_sentence, foreign_sentence):
@@ -39,25 +42,14 @@ class GrammarProjector:
             raise ParseNotFoundError
         inv_grammar = self.get_preterminal_mappings(en_sentence, back_pointers)
 
-        projection = []
-        for token in foreign_sentence.split():
-            # Check if token is punctuation
-            if token in [",", ".", "!", "?"]:
-                if token in inv_grammar:
-                    projection.append(inv_grammar[token])
-                    continue
-
-            # Check for alignments
-            # if token has a translation in our dictionary, append that word's grammar
+        projection = {token: "-" for token in foreign_sentence.split()}
+        for token in en_sentence.split():
             if token in self.bilingual_dict:
-                translation = self.bilingual_dict[token]
-                if translation in inv_grammar:
-                    projection.append(inv_grammar[translation])
-                    continue
-
-            # Otherwise, we don't know the token
-            projection.append("-")
-        return "\t".join(projection)
+                for translation in self.bilingual_dict[token]:
+                    if translation in projection:
+                        projection[translation] = inv_grammar[token]
+        projection_result = "\t".join([projection[token] for token in foreign_sentence.split()])
+        return projection_result
 
     def get_preterminal_mappings(self, sentence, backpointers):
         mappings = {}
@@ -96,7 +88,7 @@ if __name__ == "__main__":
 
     for en_sentence, foreign_sentence in zip(en_sentences, foreign_sentences):
         try:
-            p = projector.project_grammar(en_sentence.lower(), foreign_sentence)
+            p = projector.project_grammar(en_sentence.lower(), foreign_sentence.lower())
             print(foreign_sentence.replace(' ', '\t'))
             print(p)
         except ParseNotFoundError as err:
