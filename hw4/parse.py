@@ -1,8 +1,12 @@
+"""
+CKY parser based on Jason Eisner's semiring implementation.
+"""
 import itertools
 import sys
 import collections
 import numpy as np
 from typing import Dict, Tuple, List
+import argparse
 
 
 class Semiring:
@@ -35,7 +39,6 @@ class Recognizer(Semiring):
     Semiring for recognizing a parse (if a rule can be parsed).
     Weight = {true, false}
     """
-
     @staticmethod
     def weight(prob):
         return True
@@ -154,34 +157,6 @@ class Grammar:
 
         return Grammar(rules)
 
-    def parse(self, sentence, semiring):
-        cky_weight: Dict[Tuple[int, int], Dict[str, np.float64]] = collections.defaultdict(
-            lambda: collections.defaultdict(semiring.zero))
-        cky_back: Dict[Tuple[int, int], Dict[str, Tuple]] = collections.defaultdict(dict)
-
-        for j, token in enumerate(sentence, 1):
-            for rule in self.inv_pre_terms[token]:
-                old_weight = cky_weight[j - 1, j][rule.lhs]
-                new_weight = semiring.weight(rule.weight)
-                cky_weight[j - 1, j][rule.lhs] = semiring.plus(old_weight, new_weight)
-            for i in range(j - 2, -1, -1):
-                for k in range(i + 1, j):
-                    for rule in self.non_terms:
-                        assert len(rule.rhs) == 2
-                        a, b = rule.rhs
-                        c = rule.lhs
-                        if a in cky_weight[i, k] and b in cky_weight[k, j]:
-                            old_weight = cky_weight[i, j][c]
-                            new_weight = semiring.times(cky_weight[i, k][a], cky_weight[k, j][b])
-                            new_weight = semiring.times(semiring.weight(rule.weight), new_weight)
-                            new_weight = semiring.plus(old_weight, new_weight)
-                            if old_weight != new_weight:
-                                cky_weight[i, j][c] = new_weight
-                                cky_back[i, j][c] = (k, a, b)
-
-        retval = cky_weight[0, len(sent)].get('ROOT')
-        return retval, cky_back
-
 
 class OutputNode:
     def __init__(self, name):
@@ -201,46 +176,102 @@ class OutputNode:
             return self.name
 
 
-def generate_tree(tokens, backptrs, i, j, l):
-    result_node = OutputNode(l)
-    if l in backptrs[i, j]:
-        # Non-terminal case
-        k, a, b = backptrs[i, j][l]
-        result_node.add_child(generate_tree(tokens, backptrs, i, k, a))
-        result_node.add_child(generate_tree(tokens, backptrs, k, j, b))
-    elif i == j - 1:
-        # Pre-terminal case
-        result_node.add_child(OutputNode(tokens[i]))
-    return result_node
+class CKYParser:
+    def __init__(self, mode, grammar_path):
+        # Set parse mode
+        self.semiring = {'RECOGNIZER': Recognizer, 'BEST-PARSE': Viterbi,
+                         'WORST-PARSE': InvViterbi, 'TOTAL-WEIGHT': Inside}.get(mode)
+        # Read in grammar
+        with open(grammar_path) as fin:
+            self.grammar = Grammar.read_from_file(fin)
+
+    def parse_sentence(self, sentence):
+        """
+        Parses a sentence
+        :param sentence: string sentence to parse
+        :return:
+        """
+        sentence = sentence.split()
+        cky_weight: Dict[Tuple[int, int], Dict[str, np.float64]] = collections.defaultdict(
+            lambda: collections.defaultdict(self.semiring.zero))
+        cky_back: Dict[Tuple[int, int], Dict[str, Tuple]] = collections.defaultdict(dict)
+
+        for j, token in enumerate(sentence, 1):
+            for rule in self.grammar.inv_pre_terms[token]:
+                old_weight = cky_weight[j - 1, j][rule.lhs]
+                new_weight = self.semiring.weight(rule.weight)
+                cky_weight[j - 1, j][rule.lhs] = self.semiring.plus(old_weight, new_weight)
+            for i in range(j - 2, -1, -1):
+                for k in range(i + 1, j):
+                    for rule in self.grammar.non_terms:
+                        assert len(rule.rhs) == 2
+                        a, b = rule.rhs
+                        c = rule.lhs
+                        if a in cky_weight[i, k] and b in cky_weight[k, j]:
+                            old_weight = cky_weight[i, j][c]
+                            new_weight = self.semiring.times(cky_weight[i, k][a], cky_weight[k, j][b])
+                            new_weight = self.semiring.times(self.semiring.weight(rule.weight), new_weight)
+                            new_weight = self.semiring.plus(old_weight, new_weight)
+                            if old_weight != new_weight:
+                                cky_weight[i, j][c] = new_weight
+                                cky_back[i, j][c] = (k, a, b)
+
+        parse_weight = cky_weight[0, len(sentence)].get('ROOT')
+        back_pointers = cky_back
+        return parse_weight, back_pointers
+
+    def get_semiring(self):
+        return self.semiring
+
+    def generate_tree(self, sentence, backpointers):
+        tokens = sentence.split()
+        return self._generate_tree(tokens, backpointers, 0, len(tokens), "ROOT")
+
+    def _generate_tree(self, tokens, backptrs, i, j, l):
+        result_node = OutputNode(l)
+        if l in backptrs[i, j]:
+            # Non-terminal case
+            k, a, b = backptrs[i, j][l]
+            result_node.add_child(self._generate_tree(tokens, backptrs, i, k, a))
+            result_node.add_child(self._generate_tree(tokens, backptrs, k, j, b))
+        elif i == j - 1:
+            # Pre-terminal case
+            result_node.add_child(OutputNode(tokens[i]))
+        return result_node
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Parse a sentence with a given grammar")
+    parser.add_argument("mode",
+                        choices=["RECOGNIZER", "BEST-PARSE", "WORST-PARSE", "TOTAL-WEIGHT"],
+                        help="Mode of the parser")
+    parser.add_argument("grammar", help="Path to grammar file")
+    parser.add_argument("sentences", help="Path to file containing the sentences to parse")
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
-    assert len(sys.argv) == 4
-    mode, grammar_path, sents_path = sys.argv[1:]
+    args = parse_arguments()
 
-    sring = {'RECOGNIZER': Recognizer, 'BEST-PARSE': Viterbi,
-             'WORST-PARSE': InvViterbi, 'TOTAL-WEIGHT': Inside}.get(mode)
+    cky_parser = CKYParser(args.mode, args.grammar)
 
-    assert sring is not None
+    with open(args.sentences) as fin:
+        sentences = fin.readlines()
 
-    with open(grammar_path) as fin:
-        grammar = Grammar.read_from_file(fin)
+    for sent in sentences:
+        # Parse sentence
+        parse_weight, parse_backptrs = cky_parser.parse_sentence(sent)
 
-    with open(sents_path) as fin:
-        for row in fin:
-            sent = row.strip().split()
-            parse_weight, parse_backptrs = grammar.parse(sent, sring)
-
-            if mode == 'RECOGNIZER':
-                print(parse_weight is not None)
-            elif mode == 'BEST-PARSE' or mode == 'WORST-PARSE':
-                if parse_weight is not None:
-                    best_tree = generate_tree(sent, parse_backptrs, 0, len(sent), 'ROOT')
-                    print('%.3f\t%s' % (sring.inv_weight(parse_weight), best_tree))
-                else:
-                    print('NOPARSE')
-            else:  # mode == 'TOTAL-WEIGHT'
-                if parse_weight is not None:
-                    print('%.3f' % sring.inv_weight(parse_weight))
-                else:
-                    print('NOPARSE')
+        if args.mode == 'RECOGNIZER':
+            print(parse_weight is not None)
+        elif args.mode == 'BEST-PARSE' or args.mode == 'WORST-PARSE':
+            if parse_weight is not None:
+                best_tree = cky_parser.generate_tree(sent, parse_backptrs)
+                print('%.3f\t%s' % (cky_parser.get_semiring().inv_weight(parse_weight), best_tree))
+            else:
+                print('NOPARSE')
+        else:  # mode == 'TOTAL-WEIGHT'
+            if parse_weight is not None:
+                print('%.3f' % cky_parser.get_semiring().inv_weight(parse_weight))
+            else:
+                print('NOPARSE')
