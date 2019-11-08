@@ -165,22 +165,13 @@ class HMM:
         #     assert np.abs(log_prob) < 1e-9
 
     def emission_log_prob(self, token, tag):
-        if (token, tag) in self.emission_log_probs:
-            return self.emission_log_probs[token, tag]
-        else:
-            return self.oov_emission_log_probs[tag]
+        return self.emission_log_probs.get((token, tag), self.oov_emission_log_probs[tag])
 
     def transition_log_prob(self, tag, prev_tag):
-        if (tag, prev_tag) in self.transition_log_probs:
-            return self.transition_log_probs[tag, prev_tag]
-        else:
-            return self.oov_transition_log_probs[prev_tag]
+        return self.transition_log_probs.get((tag, prev_tag), self.oov_transition_log_probs[prev_tag])
 
     def tag_set(self, token):
-        if token in self.tag_dict:
-            return self.tag_dict[token]
-        else:
-            return self.oov_tag_set
+        return self.tag_dict.get(token, self.oov_tag_set)
 
     def decode_viterbi(self, test_tokens):
         prev_token = '###'
@@ -223,8 +214,9 @@ class HMM:
             cur_fwd_log_probs = defaultdict(lambda: -np.infty)
 
             for tag in self.tag_set(token):
+                emission_log_prob = self.emission_log_prob(token, tag)
                 for prev_tag in self.tag_set(prev_token):
-                    arc_log_prob = self.transition_log_prob(tag, prev_tag) + self.emission_log_prob(token, tag)
+                    arc_log_prob = self.transition_log_prob(tag, prev_tag) + emission_log_prob
                     delta_fwd_log_prob = prev_fwd_log_probs[prev_tag] + arc_log_prob
                     cur_fwd_log_probs[tag] = np.logaddexp(cur_fwd_log_probs[tag], delta_fwd_log_prob)
 
@@ -237,7 +229,7 @@ class HMM:
         best_tags = []
         prev_bck_log_probs = {'###': 0}
 
-        # probability estimates for E step of EM.
+        # Probability estimates for E step of EM.
         transition_log_cnt_em = defaultdict(lambda: -np.infty)
         emission_log_cnt_em = defaultdict(lambda: -np.infty)
 
@@ -260,8 +252,9 @@ class HMM:
             best_tags.append(cur_argmax_prob)
 
             for tag in self.tag_set(token):
+                emission_log_prob = self.emission_log_prob(token, tag)
                 for prev_tag in self.tag_set(prev_token):
-                    arc_log_prob = self.transition_log_prob(tag, prev_tag) + self.emission_log_prob(token, tag)
+                    arc_log_prob = self.transition_log_prob(tag, prev_tag) + emission_log_prob
                     delta_bck_log_prob = prev_bck_log_probs[tag] + arc_log_prob
                     cur_bck_log_probs[prev_tag] = np.logaddexp(cur_bck_log_probs[prev_tag], delta_bck_log_prob)
                     transition_log_prob = all_fwd_log_probs[i - 1][prev_tag] + delta_bck_log_prob - log_total_prob
@@ -282,7 +275,6 @@ class HMM:
             total_count += 1
             total_log_prob += self.emission_log_prob(token, tag) + self.transition_log_prob(tag, prev_tag)
 
-        # print(total_log_prob, total_count)
         perplexity_per_word = np.exp(-total_log_prob / total_count)
         print('Model perplexity per tagged test word: %.3f' % perplexity_per_word)
 
