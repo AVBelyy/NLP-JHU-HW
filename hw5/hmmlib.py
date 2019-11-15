@@ -8,6 +8,8 @@ from collections import defaultdict
 class HMM:
     def __init__(self, with_oov=False, lambd=0.):
         # Set by train_supervised and train_with_em.
+        self.oov_token_log_prob = None
+        self.oov_tag_log_prob = None
         self.transition_counts = None
         self.emission_counts = None
         self.uniq_tokens = None
@@ -102,6 +104,9 @@ class HMM:
         self.uniq_tokens = uniq_tokens
         self.uniq_tags = uniq_tags
 
+        self.oov_token_log_prob = -np.log(len(uniq_tokens))
+        self.oov_tag_log_prob = -np.log(len(uniq_tags))
+
         if self.with_oov:
             self.uniq_tokens.add('OOV')
 
@@ -165,10 +170,10 @@ class HMM:
         #     assert np.abs(log_prob) < 1e-9
 
     def emission_log_prob(self, token, tag):
-        return self.emission_log_probs.get((token, tag), self.oov_emission_log_probs[tag])
+        return self.emission_log_probs.get((token, tag), self.oov_emission_log_probs.get(tag, self.oov_token_log_prob))
 
     def transition_log_prob(self, tag, prev_tag):
-        return self.transition_log_probs.get((tag, prev_tag), self.oov_transition_log_probs[prev_tag])
+        return self.transition_log_probs.get((tag, prev_tag), self.oov_transition_log_probs.get(prev_tag, self.oov_tag_log_prob))
 
     def tag_set(self, token):
         return self.tag_dict.get(token, self.oov_tag_set)
