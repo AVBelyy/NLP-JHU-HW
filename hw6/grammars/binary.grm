@@ -2,3 +2,5 @@ Zero = "0";
 One = "1";
 Bit = Zero | One;
 export First = Optimize[Zero Zero* Bit* One One One One?];
+export Second = Optimize[Zero+ (Zero | One)* One{3,4}];
+export Disagreements = Optimize[(First - Second) | (Second - First)];
