@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Usage: fstview [files...]
+
+umask 077   # files in /tmp dir shouldn't be readable by other students
+
+if [[ $# == 0 ]]; then
+   STDINFILE=/tmp/stdin.$$.fst
+   cat > $STDINFILE
+fi
+for FSTFILE in "$@" $STDINFILE; do
+   echo === $FSTFILE ===
+   fstinfo "$FSTFILE"                  # print info about the FST
+   FSTBASE=${FSTFILE%.*}               # remove filename extension
+   PDFFILE=/tmp/${FSTBASE##*/}.$$.pdf  # target name of pdf file in /tmp directory
+   fstdraw --portrait "$FSTFILE" | dot -Tpdf > "$PDFFILE"   # make pdf file
+   echo "evince \"$PDFFILE\""
+   evince "$PDFFILE"                   # view pdf file
+   rm "$PDFFILE"
+   echo
+done
