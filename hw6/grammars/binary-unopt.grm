@@ -1,0 +1,6 @@
+Zero = "0";
+One = "1";
+Bit = Zero | One;
+export First = Zero Zero* Bit* One One One One?;
+export Second = Zero+ (Zero | One)* One{3,4};
+export Disagreements = (First - Second) | (Second - First);
