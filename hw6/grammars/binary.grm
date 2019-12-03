@@ -4,3 +4,9 @@ Bit = Zero | One;
 export First = Optimize[Zero Zero* Bit* One One One One?];
 export Second = Optimize[Zero+ (Zero | One)* One{3,4}];
 export Disagreements = Optimize[(First - Second) | (Second - First)];
+
+export Triplets = Optimize[(Zero | One{2} One+)*];
+
+export NotPillars = Optimize[Zero Bit* | Bit* Zero | (One One)* One];
+
+export Oddlets = Optimize[(Zero* One Zero* One Zero*)* Zero* One Zero* | Zero*];
