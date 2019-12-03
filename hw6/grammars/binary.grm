@@ -10,3 +10,7 @@ export Triplets = Optimize[(Zero | One{2} One+)*];
 export NotPillars = Optimize[Zero Bit* | Bit* Zero | (One One)* One];
 
 export Oddlets = Optimize[(Zero* One Zero* One Zero*)* Zero* One Zero* | Zero*];
+
+export WFlip = Optimize[((Zero : One <2>) | (Zero : Zero <1>)) ( (Zero : Zero One <0.5>) | (One : Zero <0.4>) )+ (One <0.5>)];
+
+export WeightedMultipath = Optimize[( ((Zero Zero : One <1>) | (Zero : One One <2>)) ((Zero : One <3>) | (Zero : "" <4>) ))];
