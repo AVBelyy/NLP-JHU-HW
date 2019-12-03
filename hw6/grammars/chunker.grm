@@ -1,0 +1,8 @@
+import 'byte.grm' as bytelib;     
+import 'tags.grm' as tags;  
+
+Sigma = (tags.Tags) | (bytelib.kBytes);
+SigmaStar = Optimize[Sigma*];
+
+# YOU WILL FILL IN THE REST
+
