@@ -10,6 +10,7 @@ Quant = "Quant";
 Adj = "Adj";
 Noun = "Noun";
 Nmod = "Nmod";
+Verb = "Verb";
 
 export NP = Optimize[(Art | Quant)? Adj* Noun+];
 
@@ -21,5 +22,9 @@ export BracketNP = ("" : "<") NP ("" : ">");
 export Brackets1 = Optimize[SigmaStar (BracketNP SigmaStar)*];
 export Brackets2 = CDRewrite[BracketNP, "", "", SigmaStar,'sim','obl'];
 
-export BracketTransform = MakeNmod @ Brackets2;
+export BracketTransform = Brackets2 @ CDRewrite[TransformNP, "<", ">", SigmaStar,'ltr','obl'];
+# export BracketTransform = Brackets2 @ CDRewrite[MakeNmod, "<", ">", SigmaStar,'ltr','obl'];
 
+export Temp = Quant Noun+ Verb;
+export BracketResults = Project[BracketTransform, 'output'];
+export TestBracketResults = "":BracketResults;

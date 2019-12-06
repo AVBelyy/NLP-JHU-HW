@@ -7,10 +7,18 @@ export Disagreements = Optimize[(First - Second) | (Second - First)];
 
 export Triplets = Optimize[(Zero | One{2} One+)*];
 
-export NotPillars = Optimize[Zero Bit* | Bit* Zero | (One One)* One];
+# Accepts even-length strings of 1s
+export Pillars = Optimize[(One One)*];
 
+# All binary strings that are not even-length strings of 1s
+export NotPillars = Bit* - Pillars;
+
+# Binary strings where 1s only appear and odd amount of times
 export Oddlets = Optimize[(Zero* One Zero* One Zero*)* Zero* One Zero* | Zero*];
 
 export WFlip = Optimize[((Zero : One <2>) | (Zero : Zero <1>)) ( (Zero : Zero One <0.5>) | (One : Zero <0.4>) )+ (One <0.5>)];
 
-export WeightedMultipath = Optimize[( ((Zero Zero : One <1>) | (Zero : One One <2>)) ((Zero : One <3>) | (Zero : "" <4>) ))];
+# Weighted FST that has multiple paths for (Zero, One One)
+export WeightedMultipath = ((Zero : One <0.01>) ("" : One <0.01>))| (("": One One <0.4>) (Zero : "" <0.5>));
+export WeightedMultipathOpt = Optimize[((Zero : One <0.01>) ("" : One <0.01>))| (("": One One <0.4>) (Zero : "" <0.5>))];
+
