@@ -1,3 +1,4 @@
 *.far
 *.fst
+*.pdf
 Makefile
