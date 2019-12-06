@@ -1,0 +1,17 @@
+import 'byte.grm' as bytelib;        # load a simple grammar (.grm)
+ByteSigma = (bytelib.kSpace | bytelib.kGraph);  # printable characters
+ByteSigmaStar = Optimize[ByteSigma*];
+
+export LM = LoadFst['entrain.fst'];  # load trigram language model (.fst)
+vocab = SymbolTable['entrain.sym'];  # load model's symbol table (.sym)
+Spell = StringFile['entrain.alpha', vocab, byte];
+Spell_inv = StringFile['entrain.alpha', byte, vocab];
+
+# YOU WILL FILL IN THE REST
+#export CompleteWord = Invert[Spell] @ LM;
+
+
+export testStrip = CDRewrite[ByteSigmaStar:"", "[BOS]" ByteSigma+, "[EOS]", ByteSigmaStar, 'ltr', 'opt'];
+export CompleteByte = Optimize[Invert[testStrip]];
+export CompleteWord = CompleteByte@Spell_inv@LM;
+#export CompleteWord = (ByteSigmaStar : ) ;

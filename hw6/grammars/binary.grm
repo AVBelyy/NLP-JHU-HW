@@ -22,3 +22,15 @@ export WFlip = Optimize[((Zero : One <2>) | (Zero : Zero <1>)) ( (Zero : Zero On
 export WeightedMultipath = ((Zero : One <0.01>) ("" : One <0.01>))| (("": One One <0.4>) (Zero : "" <0.5>));
 export WeightedMultipathOpt = Optimize[WeightedMultipath];
 
+# 6.c.iii
+T = WeightedMultipath;
+x = Zero;
+y = One One;
+T_out = Project[ T, 'output']; # erases input from T
+xT_out = Project[ x @ T, 'output']; # erases input x from x @ T
+Ty_in = Project[ T @ y, 'input']; # erases output y from T @ y
+xTy = x @ T @ y;
+exTye = ("":x) @ T @ (y:""); # erases input x & output y from x @ T @ y
+export xT_out_opt = Optimize[xT_out];
+export Ty_in_opt = Optimize[Ty_in];
+export exTye_opt = Optimize[exTye];
