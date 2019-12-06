@@ -20,5 +20,5 @@ export WFlip = Optimize[((Zero : One <2>) | (Zero : Zero <1>)) ( (Zero : Zero On
 
 # Weighted FST that has multiple paths for (Zero, One One)
 export WeightedMultipath = ((Zero : One <0.01>) ("" : One <0.01>))| (("": One One <0.4>) (Zero : "" <0.5>));
-export WeightedMultipathOpt = Optimize[((Zero : One <0.01>) ("" : One <0.01>))| (("": One One <0.4>) (Zero : "" <0.5>))];
+export WeightedMultipathOpt = Optimize[WeightedMultipath];
 

@@ -23,8 +23,6 @@ export Brackets1 = Optimize[SigmaStar (BracketNP SigmaStar)*];
 export Brackets2 = CDRewrite[BracketNP, "", "", SigmaStar,'sim','obl'];
 
 export BracketTransform = Brackets2 @ CDRewrite[TransformNP, "<", ">", SigmaStar,'ltr','obl'];
-# export BracketTransform = Brackets2 @ CDRewrite[MakeNmod, "<", ">", SigmaStar,'ltr','obl'];
 
-export Temp = Quant Noun+ Verb;
-export BracketResults = Project[BracketTransform, 'output'];
+export BracketResults = Project[(Quant Noun+ Verb) @ BracketTransform, 'output'];
 export TestBracketResults = "":BracketResults;
