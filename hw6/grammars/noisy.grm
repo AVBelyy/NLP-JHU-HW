@@ -4,8 +4,8 @@ ByteSigmaStar = Optimize[ByteSigma*];
 
 export LM = LoadFst['entrain.fst'];  # load trigram language model (.fst)
 vocab = SymbolTable['entrain.sym'];  # load model's symbol table (.sym)
-Spell = StringFile['entrain.alpha', vocab, byte];
-Spell_inv = StringFile['entrain.alpha', byte, vocab];
+Spell = Optimize[StringFile['entrain.alpha', vocab, byte]];
+Spell_inv = Optimize[StringFile['entrain.alpha', byte, vocab]];
 
 # YOU WILL FILL IN THE REST
 #export CompleteWord = Invert[Spell] @ LM;
@@ -15,3 +15,20 @@ export testStrip = CDRewrite[ByteSigmaStar:"", "[BOS]" ByteSigma+, "[EOS]", Byte
 export CompleteByte = Optimize[Invert[testStrip]];
 export CompleteWord = CompleteByte@Spell_inv@LM;
 #export CompleteWord = (ByteSigmaStar : ) ;
+
+# Remove spaces from input
+export DelSpaces = CDRewrite[bytelib.kSpace : "", "", "", ByteSigmaStar, 'ltr', 'obl'];
+
+# Get most likely sentences from non-spaced words
+export SpellText = Optimize[(Spell ("".vocab : " "))*];
+export CompressSpacesAll = CDRewrite[" "+ : " ", "[BOS]" | bytelib.kGraph, bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
+export CompressSpacesStart = CDRewrite[" ": "", "[BOS]", bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
+export CompressSpaces = CompressSpacesAll @ CompressSpacesStart;
+
+export Generate = LM @ SpellText @ DelSpaces;
+export Decode = Invert[Generate] @ SpellText @ CompressSpaces;
+
+#RandomChar = bytelib.kGraph <4.54>;
+#RandomWord = Optimize[(RandomChar (RandomChar <w1>)* ) <w2>];
+#SpellOOV = "<unk>".vocab : RandomWord;
+
