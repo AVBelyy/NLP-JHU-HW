@@ -1,0 +1,55 @@
+# exact implementation inspired by 
+# http://www.openfst.org/twiki/bin/view/FST/FstExamples
+
+import 'byte.grm' as bytelib;
+Char  = bytelib.kGraph | bytelib.kSpace;
+
+# We'll use some extra temporary symbols in our alphabet.
+# Note that at the moment this only works with byte encoding.
+kStar = Optimize[(Char | "[insert]" | "[delete]" | "[sub]")*];
+
+# We would like to compare string X with string Y.  It results in big
+# intermediate FSMs if we try to turn any character in X into ANY
+# other character, and only THEN check which of those characters match Y.
+# The following approach trick imposes constraints from Y sooner, giving an
+# order-of-magnitude speedup.
+
+# Here are operations that modify a single character at a cost of 0 (for copy)
+# or 1 (for any other operation).  
+
+Copy1   = Char;   # maps character to itself at an implicit cost of 0
+Delete1 = (Char : "[delete]") <1>;
+Insert1 = ("" : "[insert]") <1>;
+Subst1 	= (Char : "[sub]") <1>;
+
+# They are to be composed with the following actions, which convert the code
+# [delete] into "", and convert [insert] or [sub] into some arbitrary char.
+
+Copy2   = Char;
+Delete2 = ("[delete]" : "");
+Insert2 = ("[insert]" : Char);
+Subst2	= ("[sub]" : Char);
+
+# To compare X and Y, we should find the shortest path in 
+#     X @ edit1 @ edit2 @ Y
+
+export edit1 = Optimize[(Copy1 | Delete1 | Insert1 | Subst1)*];
+export edit2 = Optimize[(Copy2 | Delete2 | Insert2 | Subst2)*];
+
+# The editdist script efficiently computes that as
+#     (X @ edit1) @ (edit2 @ Y)
+# The parenthesization is the crucial speedup here. If we did 
+#     X @ (edit1 @ edit2) @ Y
+# then (X @ (edit1 @ edit2)) would be full of random characters
+# that X could be edited into but which won't actually turn out
+# to match Y.  The number of arcs in this machine would be 
+# O(|X| |Char|^2), where |X| is the length of X and |Char| is
+# the size of the alphabet.
+# 
+# By contrast, the output of (X @ edit1) only has the specific
+# characters from X, mixed with [delete], [insert], and [subst] codes
+# that specify an edit without saying what the output char of that
+# edit will be.  Simiarly, the input of (edit2 @ Y) only has the
+# specific characters from Y, mixed with the same codes.  
+# Both are small machines, where the number of arcs is O(|X|)
+# and O(|Y|) respectively, and does not depend on |Char|.

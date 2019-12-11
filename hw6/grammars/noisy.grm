@@ -19,20 +19,22 @@ Spell_inv = Optimize[StringFile['entrain.alpha', byte, vocab]];
 
 export StripChars = CDRewrite[ByteSigmaStar:"", "[BOS]" ByteSigma+, "[EOS]", ByteSigmaStar, 'ltr', 'opt'];
 export CompleteByte = Optimize[Invert[StripChars]];
-export CompleteWord = CompleteByte @ Spell_inv @ LM @ Spell;
+#export CompleteWord = CompleteByte @ Spell_inv @ LM @ Spell;
+export CompleteWord = Optimize[CompleteByte @ Spell_inv @ LM];
 
 # Remove spaces from input
 export DelSpaces = CDRewrite[bytelib.kSpace : "", "", "", ByteSigmaStar, 'ltr', 'obl'];
 
 # Get most likely sentences from non-spaced words
 export SpellText = Optimize[(Spell ("".vocab : " "))*];
-export CompressSpacesAll = CDRewrite[" "+ : " ", "[BOS]" | bytelib.kGraph, bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
-export CompressSpacesStart = CDRewrite[" ": "", "[BOS]", bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
-export CompressSpaces = CompressSpacesAll @ CompressSpacesStart;
+#export CompressSpacesAll = CDRewrite[" "+ : " ", "[BOS]" | bytelib.kGraph, bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
+#export CompressSpacesStart = CDRewrite[" ": "", "[BOS]", bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
+#export CompressSpaces = CompressSpacesAll @ CompressSpacesStart;
 
 export Generate = LM @ SpellText @ DelSpaces;
-export Decode = Invert[Generate] @ SpellText @ CompressSpaces;
+# export Decode = Invert[Generate] @ SpellText @ CompressSpaces;
+export Decode = Optimize[Invert[Generate] @ SpellText];
 
 ## Q8.h
-Sigma = bytelib.kBytes;
-export Edit = (Sigma | ((""|Sigma) : (""|Sigma) <1> )*;
+#Sigma = bytelib.kBytes;
+#export Edit = (Sigma | ((""|Sigma) : (""|Sigma) <1>) )*;
