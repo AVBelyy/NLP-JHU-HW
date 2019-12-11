@@ -11,21 +11,21 @@ Spell_inv = Optimize[StringFile['entrain.alpha', byte, vocab]];
 
 export StripChars = CDRewrite[ByteSigmaStar:"", "[BOS]" ByteSigma+, "[EOS]", ByteSigmaStar, 'ltr', 'opt'];
 export CompleteByte = Optimize[Invert[StripChars]];
-export CompleteWord = CompleteByte @ Spell_inv @ LM;
+export CompleteWord = CompleteByte @ Spell_inv @ LM @ Spell;
 
 # Remove spaces from input
-export DelSpaces = CDRewrite[bytelib.kSpace : "", "", "", ByteSigmaStar, 'ltr', 'obl'];
+#export DelSpaces = CDRewrite[bytelib.kSpace : "", "", "", ByteSigmaStar, 'ltr', 'obl'];
 
 # Get most likely sentences from non-spaced words
-export SpellText = Optimize[(Spell ("".vocab : " "))*];
-export CompressSpacesAll = CDRewrite[" "+ : " ", "[BOS]" | bytelib.kGraph, bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
-export CompressSpacesStart = CDRewrite[" ": "", "[BOS]", bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
-export CompressSpaces = CompressSpacesAll @ CompressSpacesStart;
+#export SpellText = Optimize[(Spell ("".vocab : " "))*];
+#export CompressSpacesAll = CDRewrite[" "+ : " ", "[BOS]" | bytelib.kGraph, bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
+#export CompressSpacesStart = CDRewrite[" ": "", "[BOS]", bytelib.kGraph | "[EOS]", ByteSigmaStar, 'sim', 'obl'];
+#export CompressSpaces = CompressSpacesAll @ CompressSpacesStart;
 
-export Generate = LM @ SpellText @ DelSpaces;
-export Decode = Invert[Generate] @ SpellText @ CompressSpaces;
+#export Generate = LM @ SpellText @ DelSpaces;
+#export Decode = Invert[Generate] @ SpellText @ CompressSpaces;
 
-#RandomChar = bytelib.kGraph <4.54>;
-#RandomWord = Optimize[(RandomChar (RandomChar <w1>)* ) <w2>];
-#SpellOOV = "<unk>".vocab : RandomWord;
+RandomChar = bytelib.kGraph <4.54>;
+export RandomWord = Optimize[(RandomChar (RandomChar <0.1>)* ) <2.3>];
+export SpellOOV = Optimize["<unk>".vocab : RandomWord];
 
