@@ -8,13 +8,10 @@ Spell = Optimize[StringFile['entrain.alpha', vocab, byte]];
 Spell_inv = Optimize[StringFile['entrain.alpha', byte, vocab]];
 
 # YOU WILL FILL IN THE REST
-#export CompleteWord = Invert[Spell] @ LM;
 
-
-export testStrip = CDRewrite[ByteSigmaStar:"", "[BOS]" ByteSigma+, "[EOS]", ByteSigmaStar, 'ltr', 'opt'];
-export CompleteByte = Optimize[Invert[testStrip]];
-export CompleteWord = CompleteByte@Spell_inv@LM;
-#export CompleteWord = (ByteSigmaStar : ) ;
+export StripChars = CDRewrite[ByteSigmaStar:"", "[BOS]" ByteSigma+, "[EOS]", ByteSigmaStar, 'ltr', 'opt'];
+export CompleteByte = Optimize[Invert[StripChars]];
+export CompleteWord = CompleteByte @ Spell_inv @ LM;
 
 # Remove spaces from input
 export DelSpaces = CDRewrite[bytelib.kSpace : "", "", "", ByteSigmaStar, 'ltr', 'obl'];
